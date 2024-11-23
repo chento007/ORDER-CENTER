@@ -1,6 +1,5 @@
-import 'package:coffee_app/app/models/product.dart';
+import 'package:coffee_app/components/popup/delete_item_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:get/get.dart';
 import 'package:coffee_app/app/controllers/product_controller.dart';
 import 'package:coffee_app/components/button/button_create_new_item.dart';
@@ -8,183 +7,293 @@ import 'package:coffee_app/components/button/icon_button_action.dart';
 import 'package:coffee_app/components/button/search_button.dart';
 import 'package:coffee_app/components/popup/add_item_dialog.dart';
 
-class DashboardPage extends StatefulWidget {
-  DashboardPage({super.key});
+class DashboardPage extends StatelessWidget {
   final ProductController productController = Get.put(ProductController());
+  final primary = Colors.blue;
 
-  @override
-  _DashboardPageState createState() => _DashboardPageState();
-}
+  final _formKey = GlobalKey<FormState>();
 
-class _DashboardPageState extends State<DashboardPage> {
-  final int _sortColumnIndex = 0;
-  bool _isAscending = true;
-  int _rowsPerPage = 10; // Define a default rows per page value
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final priceController = TextEditingController();
+  final stockQtyController = TextEditingController();
+  final discountController = TextEditingController();
+  bool light = true;
 
-  // Sort Functionality
-  void _sortData(int columnIndex, bool ascending) {
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    widget.productController.fetchProduct();
-    // TODO: implement initState
-    super.initState();
-  }
-
+  // Category selection
+  String? selectedCategory;
+  final List<String> categories = [
+    'Electronics',
+    'Books',
+    'Clothing',
+    'Home & Kitchen',
+    'Sports',
+    'Toys',
+  ];
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          SizedBox(
-            width: 1500,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Obx(
+      () {
+        if (productController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                SearchButton(
-                  hintText: "Search",
-                  onChanged: (value) {
-                    setState(() {});
-                  },
+                SizedBox(
+                  width: 1500,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SearchButton(
+                        hintText: "Search",
+                        onChanged: (value) {
+                          print("change: ${value}");
+                          // Handle search functionality if needed
+                          productController.searchText.value = value;
+                          productController.onChangeSearchTitle();
+                        },
+                      ),
+                      ButtonCreateNewItem(
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
                 ),
-                ButtonCreateNewItem(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => AddItemDialog(onAdd: (newItem) {}),
-                    );
-                  },
+                const SizedBox(height: 20),
+                Container(
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.all(20),
+                        child: DataTable(
+                          columns: const [
+                            DataColumn(label: Text('ID')),
+                            DataColumn(label: Text('Title')),
+                            DataColumn(label: Text('Price (\$)')),
+                            DataColumn(label: Text('Discount')),
+                            DataColumn(label: Text('Popular')),
+                            DataColumn(label: Text('Category')),
+                            DataColumn(label: Text('Status')),
+                            DataColumn(label: Text('Action')),
+                          ],
+                          rows: List.generate(
+                            productController.productDashboard.length,
+                            (index) => DataRow(
+                              cells: [
+                                DataCell(Text(
+                                    '${productController.productDashboard[index].id}')),
+                                DataCell(Text(productController
+                                    .productDashboard[index].name)),
+                                DataCell(Text(productController
+                                    .productDashboard[index].price)),
+                                DataCell(Text(
+                                    '${productController.productDashboard[index].discount ?? 0}')),
+                                DataCell(
+                                  Switch.adaptive(
+                                    applyCupertinoTheme: false,
+                                    value: productController
+                                        .productDashboard[index].isPopular,
+                                    onChanged: (bool value) {
+                                      productController.updatePopular(
+                                          productController
+                                              .productDashboard[index].id);
+                                    },
+                                  ),
+                                ),
+                                DataCell(Text(productController
+                                    .productDashboard[index].category.name)),
+                                DataCell(
+                                  Switch.adaptive(
+                                    applyCupertinoTheme: false,
+                                    value: productController
+                                        .productDashboard[index].status,
+                                    onChanged: (bool value) {
+                                      productController.updateStatus(
+                                          productController
+                                              .productDashboard[index].id);
+                                    },
+                                  ),
+                                ),
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      IconButtonAction(
+                                        color: const Color(0xFF0D6EFD),
+                                        icon: Icons.edit,
+                                        text: "Edit",
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                EditItemDialog(
+                                              product: productController
+                                                  .productDashboard[index],
+                                              onUpdate: (p0) {},
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(width: 10),
+                                      IconButtonAction(
+                                        color: const Color(0xFFF45A58),
+                                        icon: Icons.delete_outline,
+                                        text: "Delete",
+                                        onTap: () {
+                                          // Show the delete confirmation dialog
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) => DeleteItemDialog(
+                                              index: productController
+                                                  .productDashboard[index]
+                                                  .id, // Pass the product id
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Pagination controls
+                      Container(
+                        width: 500,
+                        margin: EdgeInsets.only(bottom: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Previous Button
+                            ElevatedButton(
+                              onPressed: productController.currentPage.value > 1
+                                  ? productController.previousPage
+                                  : null, // Disable button if on first page
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.arrow_back, color: Colors.blue),
+                                  SizedBox(width: 8),
+                                  Text('Previous',
+                                      style: TextStyle(color: Colors.blue)),
+                                ],
+                              ),
+                            ),
+
+                            // Spacer
+                            SizedBox(width: 20),
+
+                            // Page Indicator Text
+                            Text(
+                              'Page ${productController.currentPage.value}',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+
+                            // Spacer
+                            SizedBox(width: 20),
+
+                            // Next Button
+                            ElevatedButton(
+                              onPressed: productController
+                                              .productDashboard.length ==
+                                          productController.pageSize &&
+                                      productController.currentPage.value <
+                                          productController.totalPages.value
+                                  ? productController.nextPage
+                                  : null, // Disable next button if fewer than 10 products or on last page
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text('Next',
+                                      style: TextStyle(color: Colors.blue)),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward, color: Colors.blue),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: Obx(() {
-              if (widget.productController.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (widget.productController.products.isEmpty) {
-                return const Center(child: Text('No products available'));
-              }
-
-              return SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: 1500,
-                  child: PaginatedDataTable2(
-                    columnSpacing: 12,
-                    horizontalMargin: 5,
-                    minWidth: 800,
-                    sortColumnIndex: _sortColumnIndex,
-                    sortAscending: _isAscending,
-                    rowsPerPage: _rowsPerPage,
-                    dataRowHeight: 100,
-                    onRowsPerPageChanged: (value) {
-                      setState(() {
-                        _rowsPerPage = value ?? _rowsPerPage;
-                      });
-                    },
-                    onPageChanged: (page) {
-                      // Handle page changes if needed
-                    },
-                    columns: [
-                      const DataColumn(
-                        label: Center(child: Text('Order By')),
-                      ),
-                      DataColumn(
-                        label: const Center(child: Text('Title')),
-                        onSort: (columnIndex, ascending) {
-                          _sortData(columnIndex, ascending);
-                        },
-                      ),
-                      const DataColumn2(
-                        label: Text('Photo'),
-                        size: ColumnSize.L,
-                      ),
-                      DataColumn(
-                        label: const Text('Price'),
-                        onSort: (columnIndex, ascending) {
-                          _sortData(columnIndex, ascending);
-                        },
-                      ),
-                      const DataColumn(
-                        label: Text('Discount'),
-                      ),
-                      const DataColumn(
-                        label: Text('Category'),
-                      ),
-                      const DataColumn(
-                        label: Text('Actions'),
-                      ),
-                    ],
-                    source:
-                        _ProductDataSource(widget.productController.products),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
-}
 
-class _ProductDataSource extends DataTableSource {
-  final List<Product> products;
-
-  _ProductDataSource(this.products);
-
-  @override
-  DataRow? getRow(int index) {
-    if (index >= products.length) return null;
-
-    final product = products[index];
-    return DataRow(cells: [
-      DataCell(Text((index + 1).toString())),
-      DataCell(Text(product.name)),
-      DataCell(Image.network(
-        product.thumbnail,
-        width: 50,
-        height: 100,
-        fit: BoxFit.cover,
-      )),
-      DataCell(Text(product.price.toString())),
-      DataCell(Text('${(product.discount != null) ? product.discount : '0'}%')),
-      DataCell(Text(product.category.name)),
-      DataCell(
-        Row(
-          children: [
-            IconButtonAction(
-              color: const Color(0xFF0D6EFD),
-              icon: Icons.edit,
-              text: "Edit",
-              onTap: () {},
-            ),
-            const SizedBox(width: 10),
-            IconButtonAction(
-              color: const Color(0xFFF45A58),
-              icon: Icons.delete_outline,
-              text: "Delete",
-              onTap: () {},
-            ),
-          ],
+  /// Builds a text field with a label, hint, and validation
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    String? hint,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
+        filled: true,
+        fillColor: Colors.white,
       ),
-    ]);
+      keyboardType: keyboardType,
+      validator: (value) =>
+          value == null || value.isEmpty ? '$label is required' : null,
+    );
   }
 
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get rowCount => products.length;
-
-  @override
-  int get selectedRowCount => 0;
+  /// Builds a numeric text field with a label and hint
+  Widget _buildNumericField({
+    required TextEditingController controller,
+    required String label,
+    String? hint,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+      ),
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return '$label is required';
+        } else if (double.tryParse(value) == null) {
+          return 'Enter a valid number';
+        }
+        return null;
+      },
+    );
+  }
 }

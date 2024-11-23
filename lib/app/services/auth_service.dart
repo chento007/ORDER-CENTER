@@ -14,7 +14,7 @@ class AuthService {
       Uri.parse("$BASE_URL/api/auth/login"),
       body: {'email': email, 'password': password},
     );
-    print("response login : ${response.statusCode}");
+
     if (response.statusCode == 201) {
       // Assuming response contains 'access' and 'refresh' tokens
       final data = jsonDecode(response.body);

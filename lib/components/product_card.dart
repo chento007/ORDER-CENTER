@@ -2,14 +2,12 @@ import 'package:coffee_app/core/utils/screen_type_device.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatefulWidget {
-  final String imageUrl;
   final String title;
   final String price;
   final String discount;
   final VoidCallback  handleClickAddProduct;
 
   const ProductCard({
-    required this.imageUrl,
     required this.title,
     required this.price,
     required this.discount,
@@ -72,32 +70,6 @@ class _ProductCardState extends State<ProductCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      height: imageHeight,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFECEBE9),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                      ),
-                      child: Image.network(
-                        widget.imageUrl,
-                        width: double.infinity,
-                        height: imageHeight,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  // Discount Badge
-                ],
-              ),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8,
@@ -115,7 +87,7 @@ class _ProductCardState extends State<ProductCard> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

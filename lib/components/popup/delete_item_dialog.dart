@@ -1,11 +1,13 @@
+import 'package:coffee_app/app/controllers/product_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 
 class DeleteItemDialog extends StatelessWidget {
   final int index;
-  final Function onDelete;
+  final ProductController productController = Get.put(ProductController());
 
-  const DeleteItemDialog({Key? key, required this.index, required this.onDelete})
-      : super(key: key);
+  DeleteItemDialog({Key? key, required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +17,14 @@ class DeleteItemDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop();  // Close the dialog without deleting
           },
           child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
-            onDelete(index);
-            Navigator.of(context).pop();
+            productController.deleteById(index);
+            Navigator.of(context).pop();  // Close the dialog after deletion
           },
           child: const Text('Delete'),
         ),

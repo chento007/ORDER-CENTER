@@ -1,3 +1,4 @@
+import 'package:coffee_app/core/utils/screen_type_device.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -25,15 +26,54 @@ class ButtonOrderProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the screen type
+    final isPhone = ScreenTypeDevice.isPhone(context);
+    final isTablet = ScreenTypeDevice.isTablet(context);
+    final isDesktop = ScreenTypeDevice.isDesktop(context);
+    final isExtraSmall = ScreenTypeDevice.isExtraSmall(context);
+
+    // Adjust properties based on the device type
+    final double padding = isPhone
+        ? 8.0
+        : isTablet
+            ? 10.0
+            : isDesktop
+                ? 12.0
+                : 6.0; // Minimal padding for extra small
+
+    final double fontSize = isPhone
+        ? 12.0
+        : isTablet
+            ? 14.0
+            : isDesktop
+                ? 16.0
+                : 10.0; // Smaller font size for extra small
+
+    final double iconSize = isPhone
+        ? 18.0
+        : isTablet
+            ? 20.0
+            : isDesktop
+                ? 24.0
+                : 16.0; // Smaller icon size for extra small
+
+    final double borderRadius = isPhone
+        ? 8.0
+        : isTablet
+            ? 10.0
+            : isDesktop
+                ? 12.0
+                : 6.0; // Smaller border radius for extra small
+
     return InkWell(
       onTap: onPressed,
       splashColor: Colors.white.withOpacity(0.3), // Splash effect when clicked
       highlightColor: Colors.orange.withOpacity(0.1), // Highlight effect
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(padding), // Adjusted padding
         decoration: BoxDecoration(
           color: buttonColor,
-          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2), // Subtle shadow for depth
@@ -47,15 +87,19 @@ class ButtonOrderProduct extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              icon, // Custom icon
-              SizedBox(width: 8), // Space between the icon and the text
+              Icon(
+                icon.icon,
+                color: Colors.white,
+                size: iconSize, // Adjusted icon size
+              ),
+              SizedBox(width: padding), // Adjusted space between icon and text
               Text(
                 title, // Custom title
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: fontSize, // Adjusted font size
                   fontWeight: FontWeight.w600, // Bold text
                   color: Colors.white,
-                  letterSpacing: 1.2, // Letter spacing for readability
+                  letterSpacing: 1.1, // Slightly reduced letter spacing for readability
                 ),
               ),
             ],

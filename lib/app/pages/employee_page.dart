@@ -48,10 +48,7 @@ class _EmployeePageState extends State<EmployeePage> {
                 ),
                 ButtonCreateNewItem(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => AddItemDialog(onAdd: (newItem) {}),
-                    );
+                    
                   },
                 ),
               ],

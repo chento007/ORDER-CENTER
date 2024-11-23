@@ -9,7 +9,6 @@ class Api {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   Api() {
-    print("Initializing API with access token: $accessToken");
     api.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         accessToken = await getToken();

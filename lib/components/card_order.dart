@@ -29,27 +29,6 @@ class CardOrder extends StatelessWidget {
         padding: const EdgeInsets.all(5),
         child: Row(
           children: [
-            // Product Image
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  color: Colors.white,
-                ),
-                child: Image.network(
-                  invoiceDetail.product.thumbnail,
-                  width: 100,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.broken_image,
-                    size: 50,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-
             // Product Details
             Expanded(
               flex: 8,

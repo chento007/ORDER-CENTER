@@ -39,7 +39,7 @@ class AuthController extends GetxController {
       Get.offAllNamed('/home'); // You can change '/home' to your desired page
 
       // Show success message
-      Get.snackbar('Success', 'Logged in successfully!');
+      Get.snackbar('Success', 'Logged in successfully!',backgroundColor: Colors.brown,colorText: Colors.white);
     } catch (e) {
       print("login error : $e");
       // Handle errors (e.g., invalid login credentials)

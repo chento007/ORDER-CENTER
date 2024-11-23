@@ -23,8 +23,6 @@ class HomePage extends StatefulWidget {
 
   @override
   _HomePageState createState() => _HomePageState();
-
-
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
@@ -34,16 +32,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final UserController userController = Get.put(UserController());
   final CategoryController categoryController = Get.put(CategoryController());
   final InvoiceController invoiceController = Get.put(InvoiceController());
-  late TabController _tabController;
+  TabController? _tabController;
 
   final _selectedColor = const Color(0xff1a73e8);
   final _unselectedColor = const Color(0xff5f6368);
 
-
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    ever(categoryController.categories, (List<Category> categories) {
+      if (categories.isNotEmpty) {
+        productController.fetchProductsByCategory(categories.first.id);
+      }
+    });
   }
 
   @override
@@ -109,8 +117,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
     return PageView(
       controller: _pageController,
-      onPageChanged: (index) {
-        print("index selected: $index");
+      onPageChanged: (index) {        
       },
       children: [
         _buildProductTabView(crossAxisCount),
@@ -149,8 +156,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             indicatorColor: _selectedColor,
                             unselectedLabelColor: _unselectedColor,
                             onTap: (value) {
-                              print(
-                                  "tab id: ${categoryController.categories[value].id}");
                               productController.fetchProductsByCategory(
                                   categoryController.categories[value].id);
                             },
@@ -214,18 +219,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           return ProductCard(
             handleClickAddProduct: () {
               invoiceController.addInvoiceDetail(
-                InvoiceDetail(
-                  id: 1,
-                  quantity: 1,
-                  discount: product.discount ?? 0.0,
-                  unitPrice: double.parse(product.price),
-                  subTotal: double.parse(product.price),
-                  product: product,
-                ),
-                index
-              );
+                  InvoiceDetail(
+                    id: 1,
+                    quantity: 1,
+                    discount: product.discount ?? 0.0,
+                    unitPrice: double.parse(product.price),
+                    subTotal: double.parse(product.price),
+                    product: product,
+                  ),
+                  index);
             },
-            imageUrl: product.thumbnail,
             title: product.name,
             price: product.price.toString(),
             discount: product.name,

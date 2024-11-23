@@ -2,6 +2,7 @@ import 'package:coffee_app/app/models/category.dart';
 import 'package:coffee_app/app/services/auth_interceptor.dart';
 import 'package:coffee_app/core/values/constant.dart';
 import 'package:dio/dio.dart';
+import 'package:get/get.dart';
 
 class CategoryService {
   late Dio api;
@@ -16,9 +17,12 @@ class CategoryService {
     if (response.statusCode == 200) {
       var productList = response.data as List;
 
-      List<Category> categories=
+      List<Category> categories =
           productList.map((category) => Category.fromJson(category)).toList();
       return categories;
+    } else if (response.statusCode == 401) {
+      Get.offAllNamed('/login');
+      throw Exception('Unauthorized');
     } else {
       throw Exception('No users data found in the response');
     }

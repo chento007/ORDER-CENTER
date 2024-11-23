@@ -16,7 +16,8 @@ class EditItemDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final titleController = TextEditingController(text: itemData['title']);
     final priceController = TextEditingController(text: itemData['price']);
-    final discountController = TextEditingController(text: itemData['discount']);
+    final discountController =
+        TextEditingController(text: '0'); // Default to '0'
     final photoController = TextEditingController(text: itemData['photo']);
 
     return Dialog(
@@ -45,8 +46,23 @@ class EditItemDialog extends StatelessWidget {
             ),
             TextField(
               controller: discountController,
+              keyboardType: TextInputType.number, // To ensure numeric input
               decoration: const InputDecoration(labelText: 'Discount'),
+              onChanged: (value) {
+                // If the input is empty, set the text to '0'
+                if (value.isEmpty) {
+                  discountController.text = '0';
+                } else {
+                  // Ensure the value entered is a valid number
+                  final number = double.tryParse(value);
+                  if (number == null) {
+                    discountController.text =
+                        '0'; // Set to '0' if not a valid number
+                  }
+                }
+              },
             ),
+
             TextField(
               controller: photoController,
               decoration: const InputDecoration(labelText: 'Photo URL'),
@@ -62,7 +78,8 @@ class EditItemDialog extends StatelessWidget {
                     height: 100,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.error, size: 50, color: Colors.red);
+                      return const Icon(Icons.error,
+                          size: 50, color: Colors.red);
                     },
                   ),
                   const SizedBox(height: 10),
@@ -86,7 +103,6 @@ class EditItemDialog extends StatelessWidget {
                           ? photoController.text
                           : 'https://via.placeholder.com/150',
                       'price': priceController.text,
-                      'discount': discountController.text,
                       'number': itemData['number'], // Keep the number the same
                     });
                     Navigator.of(context).pop(); // Close the dialog

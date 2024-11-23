@@ -9,20 +9,12 @@ class InvoiceController extends GetxController {
 
   /// Add an invoice detail to the list
   void addInvoiceDetail(InvoiceDetail detail, int index) {
-    print("Trying to add: $detail");
 
     // Check if the product already exists in the list
     bool exists = invoiceDetails.any((existingDetail) => existingDetail.product.id == detail.product.id);
 
     if (exists) {
       // Show a toast (snackbar) if the product already exists
-      Get.snackbar(
-        "Item Already Added",
-        "This product is already in your invoice. Quantity will be updated.",
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
 
       // If the product already exists, update its quantity
       var existingDetail = invoiceDetails.firstWhere((existingDetail) => existingDetail.product.id == detail.product.id);
@@ -132,15 +124,12 @@ class InvoiceController extends GetxController {
 
     if (detail.quantity > 1) {
       detail.quantity -= 1;
-      detail.subTotal = detail.quantity * detail.unitPrice; // Update subtotal
+      detail.subTotal = detail.quantity * detail.unitPrice; 
 
-      // Notify GetX that the list has changed
       invoiceDetails[index] = detail;  // Set the updated detail back into the list
 
       // Trigger UI update
       update();
-    } else {
-      print("Cannot decrease quantity below 1");
     }
   }
 

@@ -9,4 +9,4 @@ void main() {
     getPages: AppPages.routes,
     debugShowCheckedModeBanner: false,
   ));
-  }
+}

@@ -64,7 +64,6 @@ class ProductPage extends StatelessWidget {
                         padding: const EdgeInsets.all(0),
                         child: ProductCard(
                           handleClickAddProduct: handleClickAddProduct,
-                          imageUrl: product.thumbnail,
                           title: product.name,
                           price: product.price.toString(),
                           discount: product.name.toString(),

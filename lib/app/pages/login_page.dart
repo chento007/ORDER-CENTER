@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginPage extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.put(AuthController());
@@ -119,7 +120,7 @@ class LoginPage extends StatelessWidget {
                 }),
 
                 // Forgot Password and Signup Links
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

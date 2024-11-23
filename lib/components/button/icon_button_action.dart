@@ -23,7 +23,7 @@ class IconButtonAction extends StatelessWidget {
           color: color, // Custom color
           borderRadius: BorderRadius.circular(5),
         ),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         child: Row(
           children: [
             Text(
